@@ -1,4 +1,4 @@
-package org.polimat.metricd.reader.linux;
+package org.polimat.metricd.reader;
 
 import org.apache.commons.io.FileUtils;
 import org.polimat.metricd.AbstractReader;
@@ -19,10 +19,9 @@ public class LoadAverage extends AbstractReader {
 
     private static final String FILENAME_PROC_LOAD_AVG = "/proc/loadavg";
 
-    private final File file = new File(FILENAME_PROC_LOAD_AVG);
+    private final File loadAvgFile = new File(FILENAME_PROC_LOAD_AVG);
 
     private final Integer warningLevel = Runtime.getRuntime().availableProcessors();
-
     private final Integer criticalLevel = warningLevel * 2;
 
     @Override
@@ -54,8 +53,8 @@ public class LoadAverage extends AbstractReader {
         metrics.add(new Metric<>("Load average 15 minute", "metricd/load/longterm", fifteenMinuteAverage));
 
         String[] processCounts = averages[3].split("/");
-        long runningProcesses = Long.valueOf(processCounts[0]);
-        long totalProcesses = Long.valueOf(processCounts[1]);
+        Long runningProcesses = Long.valueOf(processCounts[0]);
+        Long totalProcesses = Long.valueOf(processCounts[1]);
 
         metrics.add(new Metric<>("Running process", "metricd/processes/running", runningProcesses));
         metrics.add(new Metric<>("Total process", "metricd/processes/total", totalProcesses));
@@ -64,23 +63,17 @@ public class LoadAverage extends AbstractReader {
     }
 
     @Override
-    public void startUp() {
-        try {
-            IOUtils.checkFile(FILENAME_PROC_LOAD_AVG);
-            setEnabled(true);
-        } catch (IOException e) {
-            LOGGER.error("File {} is not exists, {} disabled", FILENAME_PROC_LOAD_AVG, getName());
-            setEnabled(false);
-        }
+    public String getName() {
+        return "Linux Load averages";
     }
 
     @Override
-    public String getName() {
-        return "Load averages";
+    public void startUp() throws Exception {
+        IOUtils.checkFile(loadAvgFile);
     }
 
     private String getFileContents() throws IOException {
-        return FileUtils.readFileToString(file);
+        return FileUtils.readFileToString(loadAvgFile);
     }
 
 }

@@ -2,9 +2,9 @@ package org.polimat.metricd;
 
 public class Threshold {
 
-    public static final int DEFAULT_WARNING_LEVEL = 70;
+    private static final int DEFAULT_WARNING_LEVEL = 70;
 
-    public static final int DEFAULT_CRITICAL_LEVEL = 90;
+    private static final int DEFAULT_CRITICAL_LEVEL = 90;
 
     public static State getState(final double value, final int warningLevel, final int criticalLevel) {
         if (warningLevel == 0 || criticalLevel == 0) {

@@ -7,9 +7,7 @@ import java.io.IOException;
 
 public class IOUtils {
 
-    public static boolean checkFile(final String filepath) throws IOException {
-        File file = new File(filepath);
-
+    public static boolean checkFile(final File file) throws IOException {
         if (!file.exists()) {
             throw new FileNotFoundException("File not found");
         }

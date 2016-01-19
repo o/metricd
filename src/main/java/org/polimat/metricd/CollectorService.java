@@ -1,5 +1,6 @@
 package org.polimat.metricd;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.util.concurrent.AbstractScheduledService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,18 +11,32 @@ import java.util.concurrent.*;
 
 public class CollectorService extends AbstractScheduledService {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(AbstractScheduledService.class);
+    private static final Integer REPORT_PERIOD = 10;
 
-    private final List<AbstractReader> readers;
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractScheduledService.class);
 
-    public CollectorService(List<AbstractReader> readers) {
-        this.readers = readers;
+    private final ReaderManager readerManager;
+
+    private final ExecutorService executorService = new ForkJoinPool(
+            Runtime.getRuntime().availableProcessors(),
+            ForkJoinPool.defaultForkJoinWorkerThreadFactory,
+            null,
+            true
+    );
+
+    private final CompletionService<List<Metric>> executorCompletionService = new ExecutorCompletionService<>(executorService);
+
+    public CollectorService(ReaderManager readerManager) {
+        this.readerManager = readerManager;
     }
 
     @Override
     protected void runOneIteration() throws Exception {
+        Stopwatch stopwatch = Stopwatch.createStarted();
         LOGGER.info("Getting metrics from readers");
+
         List<Metric> metricList = getMetricsFromReaders();
+        LOGGER.info("Metrics collected in {} ms", stopwatch.elapsed(TimeUnit.MILLISECONDS));
 
         for (Metric metric : metricList) {
             LOGGER.info(metric.toString());
@@ -30,43 +45,27 @@ public class CollectorService extends AbstractScheduledService {
 
     @Override
     protected Scheduler scheduler() {
-        return Scheduler.newFixedRateSchedule(0, 10, TimeUnit.SECONDS);
+        return Scheduler.newFixedRateSchedule(0, REPORT_PERIOD, TimeUnit.SECONDS);
     }
 
     private List<Metric> getMetricsFromReaders() {
-        ExecutorService executorService = newWorkStealingPool();
-        CompletionService<List<Metric>> executorCompletionService = new ExecutorCompletionService<>(executorService);
-        for (AbstractReader reader : readers) {
+        for (AbstractReader reader : readerManager.getEnabledReaders()) {
             executorCompletionService.submit(reader);
         }
 
         List<Metric> metricList = new ArrayList<>();
 
-        for (int i = 0; i < readers.size(); i++) {
+        for (int i = 0; i < readerManager.getEnabledReaders().size(); i++) {
             try {
                 List<Metric> metrics = executorCompletionService.take().get();
                 metricList.addAll(metrics);
-            } catch (InterruptedException e) {
-                LOGGER.warn(e.getMessage());
-            } catch (ExecutionException e) {
-                LOGGER.error(e.getMessage());
-                e.printStackTrace();
+            } catch (InterruptedException | ExecutionException e) {
+                LOGGER.error("An error occured while executing reader: {}", e.getMessage());
             }
         }
 
-        executorService.shutdown();
         LOGGER.info(executorService.toString());
-
         return metricList;
-    }
-
-    private ExecutorService newWorkStealingPool() {
-        return new ForkJoinPool(
-                Runtime.getRuntime().availableProcessors(),
-                ForkJoinPool.defaultForkJoinWorkerThreadFactory,
-                null,
-                true
-        );
     }
 
 }

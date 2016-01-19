@@ -5,25 +5,18 @@ import java.util.concurrent.Callable;
 
 abstract public class AbstractReader implements Callable<List<Metric>> {
 
+    protected static final Integer REPORT_PERIOD = 10;
+
     @Override
     public final List<Metric> call() {
         return getMetrics();
     }
 
-    private boolean isEnabled;
-
-    abstract public List<Metric> getMetrics();
-
-    abstract public void startUp();
+    abstract protected List<Metric> getMetrics();
 
     abstract public String getName();
 
-    public boolean isEnabled() {
-        return isEnabled;
+    public void startUp() throws Exception {
     }
 
-    public AbstractReader setEnabled(boolean enabled) {
-        isEnabled = enabled;
-        return this;
-    }
 }

@@ -5,8 +5,8 @@ public class Metric<V> {
     private final String name;
     private final String key;
     private final V value;
-    private String description;
     private final State state;
+    private String description;
 
     public Metric(String name, String key, V value, State state, String description) {
         this.name = name;
@@ -14,13 +14,6 @@ public class Metric<V> {
         this.value = value;
         this.state = state;
         this.description = description;
-    }
-
-    public Metric(String name, String key, V value, State state) {
-        this.name = name;
-        this.key = key;
-        this.value = value;
-        this.state = state;
     }
 
     public Metric(String name, String key, V value) {
