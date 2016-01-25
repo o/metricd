@@ -3,45 +3,43 @@ package org.polimat.metricd.reader;
 import org.polimat.metricd.AbstractReader;
 import org.polimat.metricd.Application;
 import org.polimat.metricd.Metric;
-import org.polimat.metricd.State;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.*;
 
 public class Metricd extends AbstractReader {
 
     private static final String UNKNOWN_HOSTNAME = "(none)";
+
+    private final String OS = System.getProperty("os.name");
+
+    private final String OS_VERSION = System.getProperty("os.version");
 
     @Override
     protected List<Metric> getMetrics() {
         List<Metric> metrics = new ArrayList<>();
 
         String hostName = UNKNOWN_HOSTNAME;
+
         Calendar calendar = GregorianCalendar.getInstance();
 
         try {
             hostName = InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            // Ignore
+        } catch (UnknownHostException ignored) {
+            //
         }
 
-        metrics.add(new Metric<>("Version", "metricd/version", Application.VERSION));
-        metrics.add(new Metric<>(
-                "Last update time", "metricd/last-updated", System.currentTimeMillis(),
-                State.OK,
-                String.format("Last updated %s", new SimpleDateFormat("E HH:mm:ss").format(calendar.getTime()))
-        ));
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("lastUpdated", new SimpleDateFormat("E HH:mm:ss").format(calendar.getTime()));
+        metadata.put("hostName", hostName);
+        metadata.put("operatingSystem", OS);
+        metadata.put("operationSystemVersion", OS_VERSION);
+        metadata.put("timestamp", String.valueOf(System.currentTimeMillis()));
 
-        metrics.add(new Metric<>(
-                "Hostname", "metricd/hostname", 1,
-                State.OK,
-                hostName
-        ));
+        metrics.add(new Metric<>("Version", "metricd/version", Application.VERSION));
+        metrics.add(new Metric<>("Metadata", "metricd/metadata", metadata));
 
         return metrics;
     }

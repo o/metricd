@@ -21,9 +21,6 @@ public class MemoryUsage extends AbstractReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(MemoryUsage.class);
 
     private static final String FILENAME_PROC_MEM_INFO = "/proc/meminfo";
-
-    private final File memInfoFile = new File(FILENAME_PROC_MEM_INFO);
-
     private static final Pattern TOTAL_MEMORY_PATTERN =
             Pattern.compile("MemTotal:\\s+(\\d+) kB", Pattern.MULTILINE);
     private static final Pattern FREE_MEMORY_PATTERN =
@@ -38,6 +35,7 @@ public class MemoryUsage extends AbstractReader {
             Pattern.compile("SwapFree:\\s+(\\d+) kB", Pattern.MULTILINE);
     private static final Pattern CACHED_SWAP_PATTERN =
             Pattern.compile("SwapCached:\\s+(\\d+) kB", Pattern.MULTILINE);
+    private final File memInfoFile = new File(FILENAME_PROC_MEM_INFO);
 
     @Override
     public List<Metric> getMetrics() {

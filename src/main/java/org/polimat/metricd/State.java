@@ -2,8 +2,8 @@ package org.polimat.metricd;
 
 public enum State {
     OK("ok"),
-    WARNING("warn"),
-    CRITICAL("crit");
+    WARNING("warning"),
+    CRITICAL("critical");
 
     private final String name;
 
