@@ -4,11 +4,14 @@ public class MathUtils {
 
     private static final Long ONE_MEGABYTE_AS_BYTE = 1048576L;
 
-    public static Double getPercent(final Long n, final Long total) {
+    public static Double getPercent(final long n, final long total) {
+        if (0 == n) {
+            return 0.0;
+        }
         return (n * 100d) / total;
     }
 
-    public static Long convertBytesToMb(final Long bytes) {
+    public static Long convertBytesToMb(final long bytes) {
         return bytes / ONE_MEGABYTE_AS_BYTE;
     }
 
