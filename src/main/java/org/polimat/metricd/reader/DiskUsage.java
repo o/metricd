@@ -23,7 +23,7 @@ public class DiskUsage extends AbstractReader {
         Long usableSpace = rootFSFile.getUsableSpace();
         Long usedSpace = totalSpace - usableSpace;
 
-        double usagePercentage = MathUtils.getPercent(usedSpace, totalSpace);
+        Double usagePercentage = MathUtils.getPercent(usedSpace, totalSpace);
 
         metrics.add(new Metric<>(
                 "Disk usage", "metricd/disk/usage", usagePercentage,
