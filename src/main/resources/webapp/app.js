@@ -91,24 +91,29 @@
 
             if (error) {
                 grayScaleDashboard();
-                return d3.select('#information').text('Unable to refresh metrics').transition().duration(500).style('color', colorDarkRed);
+                if (typeof (error.message) != "undefined") {
+                    notice = 'Unable to refresh metrics: ' + error.message;
+                } else {
+                    notice = 'Unable to refresh metrics: Offline';
+                }
+                return d3.select('#information').text(notice).transition().duration(500).style('color', colorDarkRed);
             }
 
             for (var i = json.length - 1; i >= 0; i--) {
                 var metricMeta;
 
-                var metricName = json[i].key;
+                var metricKey = json[i].key;
                 var metricValue = json[i].value;
 
-                if (metricName == 'metricd/metadata') {
+                if (metricKey == 'metricd/metadata') {
                     notice = json[i].value.hostName + ", last updated at " + json[i].value.lastUpdated;
                 }
 
-                if (gridMetadata[metricName] !== undefined) {
+                if (gridMetadata[metricKey] !== undefined) {
                     var percentage;
                     var limit;
 
-                    metricMeta = gridMetadata[metricName];
+                    metricMeta = gridMetadata[metricKey];
                     if (metricMeta.isDynamic && metricValue > 1) {
                         if (metricValue > metricMeta.softLimit) {
                             limit = metricMeta.hardLimit;
@@ -124,7 +129,8 @@
 
                     gridData.push(
                         {
-                            name: metricName,
+                            name: json[i].name,
+                            key: metricKey,
                             value: metricValue,
                             state: json[i].state,
                             description: json[i].description,
@@ -135,11 +141,12 @@
                     )
                 }
 
-                if (statMetadata[metricName] !== undefined) {
-                    metricMeta = statMetadata[metricName];
+                if (statMetadata[metricKey] !== undefined) {
+                    metricMeta = statMetadata[metricKey];
                     statData.push(
                         {
-                            name: metricName,
+                            name: json[i].name,
+                            key: metricKey,
                             value: metricValue,
                             state: json[i].state,
                             description: json[i].description,
