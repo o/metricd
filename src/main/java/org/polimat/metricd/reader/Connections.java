@@ -4,6 +4,7 @@ import org.apache.commons.io.FileUtils;
 import org.polimat.metricd.AbstractReader;
 import org.polimat.metricd.Metric;
 import org.polimat.metricd.State;
+import org.polimat.metricd.config.Configuration;
 import org.polimat.metricd.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,7 @@ public class Connections extends AbstractReader {
     private final File udp6File = new File(FILENAME_PROC_NET_UDP6);
 
     @Override
-    public List<Metric> getMetrics() {
+    public List<Metric> collect() {
         List<Metric> metrics = new ArrayList<>();
 
         Long tcpConnections;
@@ -73,7 +74,7 @@ public class Connections extends AbstractReader {
     }
 
     @Override
-    public void startUp() throws Exception {
+    public void startUp(Configuration configuration) throws Exception {
         IOUtils.checkFile(tcpFile);
     }
 

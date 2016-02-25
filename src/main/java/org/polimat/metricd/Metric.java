@@ -1,5 +1,7 @@
 package org.polimat.metricd;
 
+import com.google.common.base.MoreObjects;
+
 public class Metric<V> {
 
     private final String name;
@@ -45,12 +47,12 @@ public class Metric<V> {
 
     @Override
     public String toString() {
-        return "Metric{" +
-                "name='" + name + '\'' +
-                ", key='" + key + '\'' +
-                ", value=" + value +
-                ", description='" + description + '\'' +
-                ", state=" + state +
-                '}';
+        return MoreObjects.toStringHelper(this)
+                .add("name", name)
+                .add("key", key)
+                .add("value", value)
+                .add("description", description)
+                .add("state", state.getName())
+                .toString();
     }
 }

@@ -1,9 +1,12 @@
 package org.polimat.metricd.reader;
 
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Splitter;
 import org.apache.commons.io.FileUtils;
 import org.polimat.metricd.AbstractReader;
 import org.polimat.metricd.Metric;
 import org.polimat.metricd.State;
+import org.polimat.metricd.config.Configuration;
 import org.polimat.metricd.util.IOUtils;
 import org.polimat.metricd.util.StringUtils;
 import org.slf4j.Logger;
@@ -40,25 +43,29 @@ public class IOStats extends AbstractReader {
     private Boolean isFirstRun = true;
 
     @Override
-    public List<Metric> getMetrics() {
+    public List<Metric> collect() {
         List<Metric> metrics = new ArrayList<>();
 
         String line;
         try {
-            line = getBlockStatsFileContents().trim();
+            line = getBlockStatsFileContents();
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
             return metrics;
         }
 
-        String[] stats = line.split("\\s+");
+        List<String> stats = Splitter.on(CharMatcher.WHITESPACE)
+                .trimResults()
+                .omitEmptyStrings()
+                .splitToList(line);
 
-        Long currentReadOps = Long.parseLong(stats[0]);
-        Long currentReadMerged = Long.parseLong(stats[1]);
-        Long currentWriteOps = Long.parseLong(stats[4]);
-        Long currentWriteMerged = Long.parseLong(stats[5]);
-        Long currentReadSectors = Long.parseLong(stats[2]);
-        Long currentWriteSectors = Long.parseLong(stats[6]);
+
+        Long currentReadOps = Long.parseLong(stats.get(0));
+        Long currentReadMerged = Long.parseLong(stats.get(1));
+        Long currentWriteOps = Long.parseLong(stats.get(4));
+        Long currentWriteMerged = Long.parseLong(stats.get(5));
+        Long currentReadSectors = Long.parseLong(stats.get(2));
+        Long currentWriteSectors = Long.parseLong(stats.get(6));
 
         Long readOpsDiff = (currentReadOps - lastReadOps) / REPORT_PERIOD;
         Long writeOpsDiff = (currentWriteOps - lastWriteOps) / REPORT_PERIOD;
@@ -118,7 +125,7 @@ public class IOStats extends AbstractReader {
     }
 
     @Override
-    public void startUp() throws Exception {
+    public void startUp(Configuration configuration) throws Exception {
         IOUtils.checkFile(diskStatsFile);
         extractBlockName();
         IOUtils.checkFile(blockStatsFile);
@@ -143,6 +150,5 @@ public class IOStats extends AbstractReader {
     private String getBlockStatsFileContents() throws IOException {
         return FileUtils.readFileToString(blockStatsFile);
     }
-
 
 }

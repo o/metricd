@@ -10,8 +10,8 @@ public class Slf4jWriter extends AbstractWriter {
     private static final Logger LOGGER = LoggerFactory.getLogger(Slf4jWriter.class);
 
     @Override
-    protected Boolean writeBatch() {
-        for (Metric metric : getMetricList()) {
+    protected Boolean write() {
+        for (Metric metric : getMetrics()) {
             if (null != metric.getDescription()) {
                 LOGGER.info("{}, {}, {}, {}", metric.getName(), metric.getState(), metric.getValue(), metric.getDescription());
             } else {
@@ -23,6 +23,7 @@ public class Slf4jWriter extends AbstractWriter {
 
     @Override
     public String getName() {
-        return "SLF4J writer";
+        return "SLF4J console";
     }
+
 }

@@ -1,31 +1,38 @@
 #grids, #stats {
     border-bottom: 1px solid #999;
 }
+
 #grids {
     border-top: 1px solid #999;
 }
+
 .grid-metric-name {
     font-size: 10px;
     fill: #999;
     text-anchor: end;
 }
+
 .grid-metric-limit-value {
     font-size: 10px;
     text-anchor: end;
 }
+
 .grid-metric-value {
     font-size: 20px;
     text-anchor: end;
     font-weight: bold;
 }
+
 .stat-metric-name {
     font-size: 10px;
     fill: #999;
 }
+
 .stat-metric-value {
     font-size: 20px;
     font-weight: bold;
 }
+
 body {
     background-color: #F3E0BD;
     margin-top: 20px;
@@ -33,18 +40,22 @@ body {
     color: #333;
     font-family: sans-serif;
 }
+
 header, footer, #grids, #stats {
     width: 1200px;
     margin: 20px auto;
 }
+
 #information {
     font-size: 13px;
     color: #B28B3D;
 }
+
 #copyright {
     font-size: 10px;
     text-align: right;
 }
+
 h1 {
     color: #5E5E5E;
     font-size: 28px;

@@ -310,7 +310,7 @@
     };
 
 
-    var statX = function(d) {
+    var statX = function (d) {
         return d.index * 200 + 180;
     };
 
@@ -347,7 +347,7 @@
         metricValues.exit().remove();
     };
 
-    var grayScaleDashboard = function() {
+    var grayScaleDashboard = function () {
         var darkerGridElements = gridContainer.selectAll(".grid-metric-percentage, .grid-metric-value, .grid-metric-limit-value");
         var lighterGridElements = gridContainer.selectAll(".grid-metric-percentage-baseline");
         var darkerStatElements = statContainer.selectAll(".stat-metric-value");

@@ -1,9 +1,12 @@
 package org.polimat.metricd.reader;
 
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Splitter;
 import org.apache.commons.io.FileUtils;
 import org.polimat.metricd.AbstractReader;
 import org.polimat.metricd.Metric;
 import org.polimat.metricd.Threshold;
+import org.polimat.metricd.config.Configuration;
 import org.polimat.metricd.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +28,7 @@ public class LoadAverage extends AbstractReader {
     private final Integer criticalLevel = warningLevel * 2;
 
     @Override
-    public List<Metric> getMetrics() {
+    public List<Metric> collect() {
         List<Metric> metrics = new ArrayList<>();
 
         String line;
@@ -36,11 +39,14 @@ public class LoadAverage extends AbstractReader {
             return metrics;
         }
 
-        String[] averages = line.split("\\s+");
+        List<String> averages = Splitter.on(CharMatcher.WHITESPACE)
+                .trimResults()
+                .omitEmptyStrings()
+                .splitToList(line);
 
-        Double oneMinuteAverage = Double.valueOf(averages[0]);
-        Double fiveMinuteAverage = Double.valueOf(averages[1]);
-        Double fifteenMinuteAverage = Double.valueOf(averages[2]);
+        Double oneMinuteAverage = Double.valueOf(averages.get(0));
+        Double fiveMinuteAverage = Double.valueOf(averages.get(1));
+        Double fifteenMinuteAverage = Double.valueOf(averages.get(2));
 
         metrics.add(new Metric<>(
                 "Load average 1 minute", "metricd/load/shortterm", oneMinuteAverage,
@@ -52,9 +58,13 @@ public class LoadAverage extends AbstractReader {
         metrics.add(new Metric<>("Load average 5 minute", "metricd/load/midterm", fiveMinuteAverage));
         metrics.add(new Metric<>("Load average 15 minute", "metricd/load/longterm", fifteenMinuteAverage));
 
-        String[] processCounts = averages[3].split("/");
-        Long runningProcesses = Long.valueOf(processCounts[0]);
-        Long totalProcesses = Long.valueOf(processCounts[1]);
+        List<String> processCounts = Splitter.on("/")
+                .trimResults()
+                .omitEmptyStrings()
+                .splitToList(averages.get(3));
+
+        Long runningProcesses = Long.valueOf(processCounts.get(0));
+        Long totalProcesses = Long.valueOf(processCounts.get(1));
 
         metrics.add(new Metric<>("Running process", "metricd/processes/running", runningProcesses));
         metrics.add(new Metric<>("Total process", "metricd/processes/total", totalProcesses));
@@ -68,7 +78,7 @@ public class LoadAverage extends AbstractReader {
     }
 
     @Override
-    public void startUp() throws Exception {
+    public void startUp(Configuration configuration) throws Exception {
         IOUtils.checkFile(loadAvgFile);
     }
 

@@ -3,6 +3,7 @@ package org.polimat.metricd.reader;
 import org.polimat.metricd.AbstractReader;
 import org.polimat.metricd.Metric;
 import org.polimat.metricd.Threshold;
+import org.polimat.metricd.config.Configuration;
 import org.polimat.metricd.util.MathUtils;
 
 import java.io.File;
@@ -16,7 +17,7 @@ public class DiskUsage extends AbstractReader {
     private final File rootFSFile = new File(ROOT_FS);
 
     @Override
-    public List<Metric> getMetrics() {
+    public List<Metric> collect() {
         List<Metric> metrics = new ArrayList<>();
 
         Long totalSpace = rootFSFile.getTotalSpace();
@@ -46,6 +47,13 @@ public class DiskUsage extends AbstractReader {
     @Override
     public String getName() {
         return "Disk space statistics";
+    }
+
+    @Override
+    public void startUp(Configuration configuration) throws Exception {
+        if (!rootFSFile.canRead()) {
+            throw new SecurityException("Filesystem is not readable");
+        }
     }
 
 }

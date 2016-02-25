@@ -3,29 +3,24 @@ package org.polimat.metricd;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-abstract public class AbstractWriter implements Callable<Boolean> {
+abstract public class AbstractWriter implements Callable<Boolean>, Plugin {
 
-    private List<Metric> metricList;
+    private List<Metric> metrics;
 
-    public List<Metric> getMetricList() {
-        return metricList;
+    public List<Metric> getMetrics() {
+        return metrics;
     }
 
-    public AbstractWriter setMetricList(List<Metric> metricList) {
-        this.metricList = metricList;
+    public AbstractWriter setMetrics(List<Metric> metrics) {
+        this.metrics = metrics;
         return this;
     }
 
     @Override
     public final Boolean call() {
-        return writeBatch();
+        return write();
     }
 
-    abstract protected Boolean writeBatch();
-
-    abstract public String getName();
-
-    public void startUp() throws Exception {
-    }
+    abstract protected Boolean write();
 
 }

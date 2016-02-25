@@ -1,9 +1,13 @@
 package org.polimat.metricd.reader;
 
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Charsets;
+import com.google.common.base.Splitter;
 import org.apache.commons.io.FileUtils;
 import org.polimat.metricd.AbstractReader;
 import org.polimat.metricd.Metric;
 import org.polimat.metricd.Threshold;
+import org.polimat.metricd.config.Configuration;
 import org.polimat.metricd.util.IOUtils;
 import org.polimat.metricd.util.StringUtils;
 import org.slf4j.Logger;
@@ -35,7 +39,7 @@ public class NetworkUsage extends AbstractReader {
     private Boolean isFirstRun = true;
 
     @Override
-    public List<Metric> getMetrics() {
+    public List<Metric> collect() {
         List<Metric> metrics = new ArrayList<>();
 
         String lines;
@@ -47,14 +51,22 @@ public class NetworkUsage extends AbstractReader {
         }
 
         String line = StringUtils.getFirstMatchFromString(ETH0_STATS_PATTERN, lines);
-        String[] stats = line.split("\\s+");
+        if (null == line) {
+            LOGGER.error("Unable to find interface statistics");
+            return metrics;
+        }
 
-        Long currentRxBytes = Long.parseLong(stats[0]);
-        Long currentRxPackets = Long.parseLong(stats[1]);
-        Long currentRxErrors = Long.parseLong(stats[2]);
-        Long currentTxBytes = Long.parseLong(stats[8]);
-        Long currentTxPackets = Long.parseLong(stats[9]);
-        Long currentTxErrors = Long.parseLong(stats[10]);
+        List<String> stats = Splitter.on(CharMatcher.WHITESPACE)
+                .trimResults()
+                .omitEmptyStrings()
+                .splitToList(line);
+
+        Long currentRxBytes = Long.parseLong(stats.get(0));
+        Long currentRxPackets = Long.parseLong(stats.get(1));
+        Long currentRxErrors = Long.parseLong(stats.get(2));
+        Long currentTxBytes = Long.parseLong(stats.get(8));
+        Long currentTxPackets = Long.parseLong(stats.get(9));
+        Long currentTxErrors = Long.parseLong(stats.get(10));
 
         Long rxBytesDiff = (currentRxBytes - lastRxBytes) / REPORT_PERIOD;
         Long rxPacketsDiff = (currentRxPackets - lastRxPackets) / REPORT_PERIOD;
@@ -108,7 +120,7 @@ public class NetworkUsage extends AbstractReader {
     }
 
     @Override
-    public void startUp() throws Exception {
+    public void startUp(Configuration configuration) throws Exception {
         IOUtils.checkFile(devFile);
     }
 

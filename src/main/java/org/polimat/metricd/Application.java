@@ -1,62 +1,38 @@
 package org.polimat.metricd;
 
-import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ServiceManager;
-import org.polimat.metricd.httpserver.JettyServerInstantiatior;
-import org.polimat.metricd.httpserver.JsonHandler;
-import org.polimat.metricd.reader.*;
-import org.polimat.metricd.writer.JsonHandlerWriter;
-import org.polimat.metricd.writer.Slf4jWriter;
+import org.polimat.metricd.config.Configuration;
+import org.polimat.metricd.util.DataBindingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
+import java.io.File;
+import java.io.IOException;
 
 public class Application {
 
-    public static final Double VERSION = 1.8;
+    public static final String VERSION = "2.0-SNAPSHOT";
     public static final String NAME = "metricd";
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
     public static void main(String[] args) {
-        LOGGER.info("{} {} {}, {} {}, {}", System.getProperty("os.name"), System.getProperty("os.version"), System.getProperty("os.arch"), System.getProperty("java.runtime.name"), System.getProperty("java.runtime.version"), System.getProperty("java.vm.name"));
-        LOGGER.info("{} {}, getting up and running..", NAME, VERSION);
+        LOGGER.info("{} {} starting", NAME, VERSION);
 
-        ArrayBlockingQueue<List<Metric>> arrayBlockingQueue = new ArrayBlockingQueue<>(10);
+        Configuration configuration = new Configuration();
 
-        ReaderService readerService = new ReaderService(
-                Sets.newHashSet(
-                        new LoadAverage(),
-                        new DiskUsage(),
-                        new Connections(),
-                        new CpuUsage(),
-                        new IOStats(),
-                        new MemoryUsage(),
-                        new NetworkUsage(),
-                        new Metricd()
-                ),
-                arrayBlockingQueue
-        );
+        try {
+            configuration = DataBindingUtils.readConfiguration(new File("config.yml"));
+        } catch (IOException e) {
+            LOGGER.error("Unable to read configuration, exiting.");
+            LOGGER.error(e.getMessage());
+            System.exit(1);
+        }
 
-        JsonHandler jsonHandler = new JsonHandler();
-        JettyServerInstantiatior jettyServerInstantiatior = new JettyServerInstantiatior(jsonHandler);
+        final ConfigurationAwareServiceFactory configurationAwareServiceFactory = new ConfigurationAwareServiceFactory(configuration);
+        configurationAwareServiceFactory.initializePlugins();
 
-        WriterService writerService = new WriterService(
-                Sets.newHashSet(
-                        new JsonHandlerWriter(jsonHandler),
-                        new Slf4jWriter()
-                ),
-                arrayBlockingQueue
-        );
-
-
-        ServiceManager serviceManager = new ServiceManager(Sets.newHashSet(
-                readerService,
-                writerService,
-                jettyServerInstantiatior
-        ));
-
+        final ServiceManager serviceManager = new ServiceManager(configurationAwareServiceFactory.getServices());
+        LOGGER.info("Starting services");
         serviceManager.startAsync();
     }
 }

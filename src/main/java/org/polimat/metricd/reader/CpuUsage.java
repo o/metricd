@@ -1,9 +1,12 @@
 package org.polimat.metricd.reader;
 
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Splitter;
 import org.apache.commons.io.FileUtils;
 import org.polimat.metricd.AbstractReader;
 import org.polimat.metricd.Metric;
 import org.polimat.metricd.Threshold;
+import org.polimat.metricd.config.Configuration;
 import org.polimat.metricd.util.IOUtils;
 import org.polimat.metricd.util.MathUtils;
 import org.polimat.metricd.util.StringUtils;
@@ -42,7 +45,7 @@ public class CpuUsage extends AbstractReader {
     private Boolean isFirstRun = true;
 
     @Override
-    public List<Metric> getMetrics() {
+    public List<Metric> collect() {
         List<Metric> metrics = new ArrayList<>();
 
         String lines;
@@ -53,19 +56,27 @@ public class CpuUsage extends AbstractReader {
             return metrics;
         }
 
-        String line = StringUtils.getFirstMatchFromString(CPU_JIFFIES_PATTERN, lines).trim();
-        String[] stats = line.split("\\s+");
+        String line = StringUtils.getFirstMatchFromString(CPU_JIFFIES_PATTERN, lines);
+        if (null == line) {
+            LOGGER.error("Unable to find CPU statistics");
+            return metrics;
+        }
 
-        Long currentUser = Long.parseLong(stats[0]);
-        Long currentNice = Long.parseLong(stats[1]);
-        Long currentSystem = Long.parseLong(stats[2]);
-        Long currentIdle = Long.parseLong(stats[3]);
-        Long currentIoWait = Long.parseLong(stats[4]);
-        Long currentIrq = Long.parseLong(stats[5]);
-        Long currentSoftIrq = Long.parseLong(stats[6]);
-        Long currentSteal = Long.parseLong(stats[7]);
-        Long currentGuest = Long.parseLong(stats[8]);
-        Long currentGuestNice = Long.parseLong(stats[9]);
+        List<String> stats = Splitter.on(CharMatcher.WHITESPACE)
+                .trimResults()
+                .omitEmptyStrings()
+                .splitToList(line);
+
+        Long currentUser = Long.parseLong(stats.get(0));
+        Long currentNice = Long.parseLong(stats.get(1));
+        Long currentSystem = Long.parseLong(stats.get(2));
+        Long currentIdle = Long.parseLong(stats.get(3));
+        Long currentIoWait = Long.parseLong(stats.get(4));
+        Long currentIrq = Long.parseLong(stats.get(5));
+        Long currentSoftIrq = Long.parseLong(stats.get(6));
+        Long currentSteal = Long.parseLong(stats.get(7));
+        Long currentGuest = Long.parseLong(stats.get(8));
+        Long currentGuestNice = Long.parseLong(stats.get(9));
         Long currentTotalJiffies = 0L;
         for (String jiffy : stats) {
             currentTotalJiffies += Long.parseLong(jiffy);
@@ -143,7 +154,7 @@ public class CpuUsage extends AbstractReader {
     }
 
     @Override
-    public void startUp() throws Exception {
+    public void startUp(Configuration configuration) throws Exception {
         IOUtils.checkFile(statFile);
     }
 
