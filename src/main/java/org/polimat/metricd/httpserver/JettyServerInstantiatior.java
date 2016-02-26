@@ -28,7 +28,7 @@ public class JettyServerInstantiatior {
 
     private static final Integer MIN_THREAD_SIZE = 1;
 
-    private static final Integer MAX_THREAD_SIZE = 8;
+    private static final Integer MAX_THREAD_SIZE = 6;
 
     private static final Integer ACCEPT_BACKLOG = 20;
 
