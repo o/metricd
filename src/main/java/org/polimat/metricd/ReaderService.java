@@ -16,16 +16,13 @@ public class ReaderService extends AbstractScheduledService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReaderService.class);
 
+    private static final Integer TIMEOUT = 4;
+
+    private static final TimeUnit TIMEOUT_UNIT = TimeUnit.SECONDS;
+
     private final Set<AbstractReader> readers;
 
-    private final ExecutorService executorService = new ForkJoinPool(
-            Runtime.getRuntime().availableProcessors(),
-            ForkJoinPool.defaultForkJoinWorkerThreadFactory,
-            null,
-            true
-    );
-
-    private final CompletionService<List<Metric>> executorCompletionService = new ExecutorCompletionService<>(executorService);
+    private final CompletionService<List<Metric>> executorCompletionService = new ExecutorCompletionService<>(ForkJoinPool.commonPool());
 
     private final ArrayBlockingQueue<List<Metric>> arrayBlockingQueue;
 
@@ -47,7 +44,7 @@ public class ReaderService extends AbstractScheduledService {
 
         for (int i = 0; i < readers.size(); i++) {
             try {
-                List<Metric> metrics = executorCompletionService.take().get();
+                List<Metric> metrics = executorCompletionService.take().get(TIMEOUT, TIMEOUT_UNIT);
                 metricList.addAll(metrics);
             } catch (InterruptedException | ExecutionException e) {
                 LOGGER.error("An error occured while executing reader: {}", e.getMessage());

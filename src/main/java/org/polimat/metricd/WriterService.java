@@ -13,16 +13,13 @@ public class WriterService extends AbstractExecutionThreadService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WriterService.class);
 
+    private static final Integer TIMEOUT = 4;
+
+    private static final TimeUnit TIMEOUT_UNIT = TimeUnit.SECONDS;
+
     private final Set<AbstractWriter> writers;
 
-    private final ExecutorService executorService = new ForkJoinPool(
-            Runtime.getRuntime().availableProcessors(),
-            ForkJoinPool.defaultForkJoinWorkerThreadFactory,
-            null,
-            true
-    );
-
-    private final CompletionService<Boolean> executorCompletionService = new ExecutorCompletionService<>(executorService);
+    private final CompletionService<Boolean> executorCompletionService = new ExecutorCompletionService<>(ForkJoinPool.commonPool());
 
     private final ArrayBlockingQueue<List<Metric>> arrayBlockingQueue;
 
@@ -45,7 +42,7 @@ public class WriterService extends AbstractExecutionThreadService {
 
             for (int i = 0; i < writers.size(); i++) {
                 try {
-                    executorCompletionService.take().get();
+                    executorCompletionService.take().get(TIMEOUT, TIMEOUT_UNIT);
                 } catch (InterruptedException | ExecutionException e) {
                     LOGGER.error("An error occured while executing writer: {}", e.getMessage());
                 }
