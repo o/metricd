@@ -2,11 +2,12 @@ package org.polimat.metricd;
 
 import org.polimat.metricd.config.Configuration;
 
+import java.util.Set;
+
 public interface Plugin {
 
     String getName();
 
-    default void startUp(Configuration configuration) throws Exception {
-    }
+    Set<Plugin> build(Configuration configuration) throws Exception;
 
 }

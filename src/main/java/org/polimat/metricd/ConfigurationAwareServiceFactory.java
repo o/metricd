@@ -10,6 +10,7 @@ import org.polimat.metricd.writer.Slf4jWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InvalidClassException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -52,18 +53,21 @@ public class ConfigurationAwareServiceFactory {
 
         for (Plugin plugin : plugins) {
             try {
-                LOGGER.info("Starting plugin {}", plugin.getName());
-                plugin.startUp(configuration);
+                LOGGER.info("Building plugin {}", plugin.getName());
+                Set<Plugin> pluginSet = plugin.build(configuration);
 
-                if (plugin instanceof AbstractReader) {
-                    enabledReaders.add((AbstractReader) plugin);
-                    LOGGER.info("{} reader enabled", plugin.getName());
+                for (Plugin builtPlugin : pluginSet) {
+                    if (builtPlugin instanceof AbstractReader) {
+                        enabledReaders.add((AbstractReader) builtPlugin);
+                        LOGGER.info("{} reader enabled", plugin.getName());
+                    } else if (builtPlugin instanceof AbstractWriter) {
+                        enabledWriters.add((AbstractWriter) builtPlugin);
+                        LOGGER.info("{} writer enabled", plugin.getName());
+                    } else {
+                        throw new InvalidClassException(plugin.getClass().getName(), "Unexpected plugin type");
+                    }
                 }
 
-                if (plugin instanceof AbstractWriter) {
-                    enabledWriters.add((AbstractWriter) plugin);
-                    LOGGER.info("{} writer enabled", plugin.getName());
-                }
 
             } catch (Exception e) {
                 LOGGER.warn("Plugin {} disabled, cause: {}", plugin.getName(), e.getMessage());

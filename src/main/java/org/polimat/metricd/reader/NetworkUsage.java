@@ -1,11 +1,12 @@
 package org.polimat.metricd.reader;
 
 import com.google.common.base.CharMatcher;
-import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
+import com.google.common.collect.Sets;
 import org.apache.commons.io.FileUtils;
 import org.polimat.metricd.AbstractReader;
 import org.polimat.metricd.Metric;
+import org.polimat.metricd.Plugin;
 import org.polimat.metricd.Threshold;
 import org.polimat.metricd.config.Configuration;
 import org.polimat.metricd.util.IOUtils;
@@ -17,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class NetworkUsage extends AbstractReader {
@@ -120,8 +122,9 @@ public class NetworkUsage extends AbstractReader {
     }
 
     @Override
-    public void startUp(Configuration configuration) throws Exception {
+    public Set<Plugin> build(Configuration configuration) throws Exception {
         IOUtils.checkFile(devFile);
+        return Sets.newHashSet(this);
     }
 
     private String getFileContents() throws IOException {

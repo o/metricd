@@ -1,8 +1,10 @@
 package org.polimat.metricd.reader;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.io.FileUtils;
 import org.polimat.metricd.AbstractReader;
 import org.polimat.metricd.Metric;
+import org.polimat.metricd.Plugin;
 import org.polimat.metricd.State;
 import org.polimat.metricd.config.Configuration;
 import org.polimat.metricd.util.IOUtils;
@@ -13,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class Connections extends AbstractReader {
 
@@ -74,8 +77,9 @@ public class Connections extends AbstractReader {
     }
 
     @Override
-    public void startUp(Configuration configuration) throws Exception {
+    public Set<Plugin> build(Configuration configuration) throws Exception {
         IOUtils.checkFile(tcpFile);
+        return Sets.newHashSet(this);
     }
 
     private List<String> getTcpConnectionsFileLines() throws IOException {

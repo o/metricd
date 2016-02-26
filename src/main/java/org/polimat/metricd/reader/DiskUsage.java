@@ -1,7 +1,9 @@
 package org.polimat.metricd.reader;
 
+import com.google.common.collect.Sets;
 import org.polimat.metricd.AbstractReader;
 import org.polimat.metricd.Metric;
+import org.polimat.metricd.Plugin;
 import org.polimat.metricd.Threshold;
 import org.polimat.metricd.config.Configuration;
 import org.polimat.metricd.util.MathUtils;
@@ -9,6 +11,7 @@ import org.polimat.metricd.util.MathUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class DiskUsage extends AbstractReader {
 
@@ -50,10 +53,11 @@ public class DiskUsage extends AbstractReader {
     }
 
     @Override
-    public void startUp(Configuration configuration) throws Exception {
+    public Set<Plugin> build(Configuration configuration) throws Exception {
         if (!rootFSFile.canRead()) {
             throw new SecurityException("Filesystem is not readable");
         }
+        return Sets.newHashSet(this);
     }
 
 }
