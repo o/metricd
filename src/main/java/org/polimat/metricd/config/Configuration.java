@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Sets;
 import org.polimat.metricd.Plugin;
 import org.polimat.metricd.config.node.*;
-import org.polimat.metricd.reader.Metricd;
+import org.polimat.metricd.reader.MetadataReader;
 
 import java.util.Set;
 
@@ -42,7 +42,7 @@ public class Configuration {
     public Set<Plugin> getPlugins() {
         Set<Plugin> plugins = Sets.newHashSet();
 
-        plugins.add(new Metricd());
+        plugins.add(new MetadataReader());
         plugins.addAll(connections.buildIfEnabled());
         plugins.addAll(cpu.buildIfEnabled());
         plugins.addAll(disk.buildIfEnabled());

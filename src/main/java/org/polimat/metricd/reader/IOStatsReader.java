@@ -18,9 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class IOStats extends AbstractReader {
+public class IOStatsReader extends AbstractReader {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(IOStats.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IOStatsReader.class);
 
     private static final String FILENAME_SYS_BLOCK_STAT = "/sys/block/%s/stat";
 

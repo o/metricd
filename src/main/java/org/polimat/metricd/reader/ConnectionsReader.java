@@ -13,9 +13,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Connections extends AbstractReader {
+public class ConnectionsReader extends AbstractReader {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Connections.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionsReader.class);
 
     private static final String FILENAME_PROC_NET_TCP = "/proc/net/tcp";
     private static final String FILENAME_PROC_NET_UDP = "/proc/net/udp";

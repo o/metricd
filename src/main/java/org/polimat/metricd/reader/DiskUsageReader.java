@@ -9,7 +9,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DiskUsage extends AbstractReader {
+public class DiskUsageReader extends AbstractReader {
 
     private static final String ROOT_FS = "/";
 

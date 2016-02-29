@@ -4,9 +4,6 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Service;
 import org.polimat.metricd.config.Configuration;
-import org.polimat.metricd.reader.*;
-import org.polimat.metricd.writer.Jetty;
-import org.polimat.metricd.writer.Console;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

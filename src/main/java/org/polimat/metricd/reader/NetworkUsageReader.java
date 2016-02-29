@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class NetworkUsage extends AbstractReader {
+public class NetworkUsageReader extends AbstractReader {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NetworkUsage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NetworkUsageReader.class);
 
     private static final Pattern ETH0_STATS_PATTERN = Pattern.compile("eth0:\\s+(.*)", Pattern.MULTILINE);
 

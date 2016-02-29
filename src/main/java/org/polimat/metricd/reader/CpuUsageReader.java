@@ -18,9 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class CpuUsage extends AbstractReader {
+public class CpuUsageReader extends AbstractReader {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CpuUsage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CpuUsageReader.class);
 
     private static final String FILENAME_PROC_STAT = "/proc/stat";
     private static final Pattern CPU_JIFFIES_PATTERN =

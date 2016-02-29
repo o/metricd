@@ -15,9 +15,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LoadAverage extends AbstractReader {
+public class LoadAverageReader extends AbstractReader {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoadAverage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoadAverageReader.class);
 
     private static final String FILENAME_PROC_LOAD_AVG = "/proc/loadavg";
 

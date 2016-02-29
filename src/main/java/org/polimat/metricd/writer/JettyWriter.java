@@ -4,7 +4,7 @@ import org.polimat.metricd.AbstractWriter;
 import org.polimat.metricd.httpserver.JettyServerInstantiatior;
 import org.polimat.metricd.httpserver.JsonEndpointHandler;
 
-public class Jetty extends AbstractWriter {
+public class JettyWriter extends AbstractWriter {
 
     private final JsonEndpointHandler jsonEndpointHandler = new JsonEndpointHandler();
 
@@ -12,7 +12,7 @@ public class Jetty extends AbstractWriter {
 
     private final Integer PORT;
 
-    public Jetty(Integer PORT) {
+    public JettyWriter(Integer PORT) {
         this.PORT = PORT;
     }
 

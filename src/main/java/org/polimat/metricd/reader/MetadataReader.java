@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Metricd extends AbstractReader {
+public class MetadataReader extends AbstractReader {
 
     private static final String UNKNOWN_HOSTNAME = "(none)";
 
@@ -26,7 +26,7 @@ public class Metricd extends AbstractReader {
 
     private final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("E HH:mm:ss");
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Metricd.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MetadataReader.class);
 
     @Override
     protected List<Metric> collect() {

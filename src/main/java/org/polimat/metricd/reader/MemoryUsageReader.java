@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class MemoryUsage extends AbstractReader {
+public class MemoryUsageReader extends AbstractReader {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MemoryUsage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MemoryUsageReader.class);
 
     private static final String FILENAME_PROC_MEM_INFO = "/proc/meminfo";
     private static final Pattern TOTAL_MEMORY_PATTERN =
