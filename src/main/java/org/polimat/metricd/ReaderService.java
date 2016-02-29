@@ -44,8 +44,11 @@ public class ReaderService extends AbstractScheduledService {
 
         for (int i = 0; i < readers.size(); i++) {
             try {
-                List<Metric> metrics = executorCompletionService.take().get(TIMEOUT, TIMEOUT_UNIT);
-                metricList.addAll(metrics);
+                Future<List<Metric>> future = executorCompletionService.poll(TIMEOUT, TIMEOUT_UNIT);
+                if (null != future) {
+                    List<Metric> metrics = future.get();
+                    metricList.addAll(metrics);
+                }
             } catch (InterruptedException | ExecutionException e) {
                 LOGGER.error("An error occured while executing reader: {}", e.getMessage());
             }

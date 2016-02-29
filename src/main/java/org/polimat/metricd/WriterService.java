@@ -42,7 +42,10 @@ public class WriterService extends AbstractExecutionThreadService {
 
             for (int i = 0; i < writers.size(); i++) {
                 try {
-                    executorCompletionService.take().get(TIMEOUT, TIMEOUT_UNIT);
+                    Future<Boolean> future = executorCompletionService.poll(TIMEOUT, TIMEOUT_UNIT);
+                    if (null != future) {
+                        Boolean result = future.get();
+                    }
                 } catch (InterruptedException | ExecutionException e) {
                     LOGGER.error("An error occured while executing writer: {}", e.getMessage());
                 }
