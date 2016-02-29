@@ -4,7 +4,6 @@ import org.apache.commons.io.FileUtils;
 import org.polimat.metricd.AbstractReader;
 import org.polimat.metricd.Metric;
 import org.polimat.metricd.State;
-import org.polimat.metricd.config.Configuration;
 import org.polimat.metricd.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +73,7 @@ public class Connections extends AbstractReader {
     }
 
     @Override
-    public void startUp(Configuration configuration) throws Exception {
+    public void startUp() throws Exception {
         IOUtils.checkFile(tcpFile);
     }
 

@@ -1,5 +1,28 @@
 ---
-server:
-  port: 8092
+connections:
   enabled: true
 
+cpu:
+  enabled: true
+
+disk:
+  enabled: true
+
+io:
+  enabled: true
+
+load:
+  enabled: true
+
+memory:
+  enabled: true
+
+network:
+  enabled: true
+
+console:
+  enabled: true
+
+jetty:
+  enabled: true
+  port: 8092

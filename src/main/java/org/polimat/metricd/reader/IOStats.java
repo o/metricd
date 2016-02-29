@@ -6,7 +6,6 @@ import org.apache.commons.io.FileUtils;
 import org.polimat.metricd.AbstractReader;
 import org.polimat.metricd.Metric;
 import org.polimat.metricd.State;
-import org.polimat.metricd.config.Configuration;
 import org.polimat.metricd.util.IOUtils;
 import org.polimat.metricd.util.StringUtils;
 import org.slf4j.Logger;
@@ -125,7 +124,7 @@ public class IOStats extends AbstractReader {
     }
 
     @Override
-    public void startUp(Configuration configuration) throws Exception {
+    public void startUp() throws Exception {
         IOUtils.checkFile(diskStatsFile);
         extractBlockName();
         IOUtils.checkFile(blockStatsFile);

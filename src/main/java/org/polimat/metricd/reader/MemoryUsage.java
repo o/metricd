@@ -4,7 +4,6 @@ import org.apache.commons.io.FileUtils;
 import org.polimat.metricd.AbstractReader;
 import org.polimat.metricd.Metric;
 import org.polimat.metricd.Threshold;
-import org.polimat.metricd.config.Configuration;
 import org.polimat.metricd.util.IOUtils;
 import org.polimat.metricd.util.MathUtils;
 import org.polimat.metricd.util.StringUtils;
@@ -99,7 +98,7 @@ public class MemoryUsage extends AbstractReader {
     }
 
     @Override
-    public void startUp(Configuration configuration) throws Exception {
+    public void startUp() throws Exception {
         IOUtils.checkFile(memInfoFile);
     }
 

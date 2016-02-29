@@ -5,9 +5,9 @@ import org.polimat.metricd.Metric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Slf4jWriter extends AbstractWriter {
+public class Console extends AbstractWriter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Slf4jWriter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Console.class);
 
     @Override
     protected Boolean write() {

@@ -5,8 +5,8 @@ import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Service;
 import org.polimat.metricd.config.Configuration;
 import org.polimat.metricd.reader.*;
-import org.polimat.metricd.writer.JettyWriter;
-import org.polimat.metricd.writer.Slf4jWriter;
+import org.polimat.metricd.writer.Jetty;
+import org.polimat.metricd.writer.Console;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,18 +21,6 @@ public class ConfigurationAwareServiceFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationAwareServiceFactory.class);
     private final Configuration configuration;
     private final ArrayBlockingQueue<List<Metric>> arrayBlockingQueue = new ArrayBlockingQueue<>(10);
-    private final Set<Plugin> plugins = Sets.newHashSet(
-            new LoadAverage(),
-            new DiskUsage(),
-            new Connections(),
-            new CpuUsage(),
-            new IOStats(),
-            new MemoryUsage(),
-            new NetworkUsage(),
-            new Metricd(),
-            new JettyWriter(),
-            new Slf4jWriter()
-    );
 
     private final Set<AbstractReader> enabledReaders = new HashSet<>();
 
@@ -50,10 +38,10 @@ public class ConfigurationAwareServiceFactory {
         LOGGER.info("Initializing plugins");
         Stopwatch stopwatch = Stopwatch.createStarted();
 
-        for (Plugin plugin : plugins) {
+        for (Plugin plugin : configuration.getPlugins()) {
             try {
                 LOGGER.info("Starting plugin {}", plugin.getName());
-                plugin.startUp(configuration);
+                plugin.startUp();
 
                 if (plugin instanceof AbstractReader) {
                     enabledReaders.add((AbstractReader) plugin);

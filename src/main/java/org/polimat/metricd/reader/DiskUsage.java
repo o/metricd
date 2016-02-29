@@ -3,7 +3,6 @@ package org.polimat.metricd.reader;
 import org.polimat.metricd.AbstractReader;
 import org.polimat.metricd.Metric;
 import org.polimat.metricd.Threshold;
-import org.polimat.metricd.config.Configuration;
 import org.polimat.metricd.util.MathUtils;
 
 import java.io.File;
@@ -50,7 +49,7 @@ public class DiskUsage extends AbstractReader {
     }
 
     @Override
-    public void startUp(Configuration configuration) throws Exception {
+    public void startUp() throws Exception {
         if (!rootFSFile.canRead()) {
             throw new SecurityException("Filesystem is not readable");
         }
