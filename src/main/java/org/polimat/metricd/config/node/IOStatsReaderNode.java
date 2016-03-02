@@ -6,7 +6,7 @@ import org.polimat.metricd.reader.IOStatsReader;
 
 import java.util.Set;
 
-public class IOStatsNode extends AbstractNode {
+public class IOStatsReaderNode extends AbstractNode {
 
     @Override
     protected Set<Plugin> build() {

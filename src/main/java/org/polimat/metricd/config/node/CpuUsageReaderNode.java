@@ -2,14 +2,14 @@ package org.polimat.metricd.config.node;
 
 import com.google.common.collect.Sets;
 import org.polimat.metricd.Plugin;
-import org.polimat.metricd.reader.MemoryUsageReader;
+import org.polimat.metricd.reader.CpuUsageReader;
 
 import java.util.Set;
 
-public class MemoryUsageNode extends AbstractNode {
+public class CpuUsageReaderNode extends AbstractNode {
 
     @Override
     protected Set<Plugin> build() {
-        return Sets.newHashSet(new MemoryUsageReader());
+        return Sets.newHashSet(new CpuUsageReader());
     }
 }

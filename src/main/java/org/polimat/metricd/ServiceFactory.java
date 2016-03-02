@@ -13,9 +13,9 @@ import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-public class ConfigurationAwareServiceFactory {
+public class ServiceFactory {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationAwareServiceFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceFactory.class);
     private final Configuration configuration;
     private final ArrayBlockingQueue<List<Metric>> arrayBlockingQueue = new ArrayBlockingQueue<>(10);
 
@@ -23,7 +23,7 @@ public class ConfigurationAwareServiceFactory {
 
     private final Set<AbstractWriter> enabledWriters = new HashSet<>();
 
-    public ConfigurationAwareServiceFactory(Configuration configuration) {
+    public ServiceFactory(Configuration configuration) {
         this.configuration = configuration;
     }
 

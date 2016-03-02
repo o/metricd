@@ -8,7 +8,7 @@ import org.polimat.metricd.writer.JettyWriter;
 
 import java.util.Set;
 
-public class JettyNode extends AbstractNode {
+public class JettyWriterNode extends AbstractNode {
 
     @JsonProperty
     private Integer port;
@@ -17,14 +17,14 @@ public class JettyNode extends AbstractNode {
         return port;
     }
 
-    public JettyNode setPort(Integer port) {
+    public JettyWriterNode setPort(Integer port) {
         this.port = port;
         return this;
     }
 
     @Override
     protected Set<Plugin> build() {
-        Preconditions.checkNotNull(getPort(), "Missing port property in Jetty configuation");
+        Preconditions.checkNotNull(getPort(), "Missing port property in Jetty Writer configuation");
         return Sets.newHashSet(new JettyWriter(getPort()));
     }
 }
