@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class Application {
 
-    public static final String VERSION = "2.0-SNAPSHOT";
+    public static final Double VERSION = 2.0;
     public static final String NAME = "metricd";
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
@@ -28,7 +28,7 @@ public class Application {
             System.exit(1);
         }
 
-        final ConfigurationAwareServiceFactory configurationAwareServiceFactory = new ConfigurationAwareServiceFactory(configuration);
+        final ServiceFactory configurationAwareServiceFactory = new ServiceFactory(configuration);
         configurationAwareServiceFactory.initializePlugins();
 
         final ServiceManager serviceManager = new ServiceManager(configurationAwareServiceFactory.getServices());

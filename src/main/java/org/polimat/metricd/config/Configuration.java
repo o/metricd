@@ -12,31 +12,34 @@ import java.util.Set;
 public class Configuration {
 
     @JsonProperty
-    private ConsoleNode console;
+    private ConsoleWriterNode console;
 
     @JsonProperty
-    private JettyNode jetty;
+    private JettyWriterNode jetty;
 
     @JsonProperty
-    private ConnectionsNode connections;
+    private ConnectionsReaderNode connections;
 
     @JsonProperty
-    private CpuUsageNode cpu;
+    private CpuUsageReaderNode cpu;
 
     @JsonProperty
-    private DiskUsageNode disk;
+    private DiskUsageReaderNode disk;
 
     @JsonProperty
-    private IOStatsNode io;
+    private IOStatsReaderNode io;
 
     @JsonProperty
-    private LoadAverageNode load;
+    private LoadAverageReaderNode load;
 
     @JsonProperty
-    private MemoryUsageNode memory;
+    private MemoryUsageReaderNode memory;
 
     @JsonProperty
-    private NetworkUsageNode network;
+    private NetworkUsageReaderNode network;
+
+    @JsonProperty
+    private RiemannWriterNode riemann;
 
     @JsonIgnore
     public Set<Plugin> getPlugins() {
@@ -52,6 +55,7 @@ public class Configuration {
         plugins.addAll(network.buildIfEnabled());
         plugins.addAll(console.buildIfEnabled());
         plugins.addAll(jetty.buildIfEnabled());
+        plugins.addAll(riemann.buildIfEnabled());
 
         return plugins;
     }

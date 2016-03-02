@@ -26,3 +26,8 @@ console:
 jetty:
   enabled: true
   port: 8092
+
+riemann:
+  enabled: false
+  host: 127.0.0.2
+  port: 5555

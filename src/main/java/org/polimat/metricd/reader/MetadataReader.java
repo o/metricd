@@ -1,13 +1,14 @@
 package org.polimat.metricd.reader;
 
+import com.google.common.base.StandardSystemProperty;
 import org.polimat.metricd.AbstractReader;
 import org.polimat.metricd.Application;
 import org.polimat.metricd.Metric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -20,9 +21,9 @@ public class MetadataReader extends AbstractReader {
 
     private static final String UNKNOWN_HOSTNAME = "(none)";
 
-    private final String OS = System.getProperty("os.name");
+    private final String OS = StandardSystemProperty.OS_NAME.value();
 
-    private final String OS_VERSION = System.getProperty("os.version");
+    private final String OS_VERSION = StandardSystemProperty.OS_VERSION.value();
 
     private final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("E HH:mm:ss");
 
@@ -41,8 +42,8 @@ public class MetadataReader extends AbstractReader {
             hostName = localhost.getHostName();
             hostAddress = localhost.getHostAddress();
             canonicalHostName = localhost.getCanonicalHostName();
-        } catch (IOException ignored) {
-            LOGGER.error("Unable to get hostname and ip address");
+        } catch (UnknownHostException e) { // Why JVM can't catch this?
+            LOGGER.error(e.getMessage());
         }
 
         Map<String, String> metadata = new HashMap<>();

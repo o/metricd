@@ -50,7 +50,19 @@
             <artifactId>jackson-dataformat-yaml</artifactId>
             <version>${jackson.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.aphyr</groupId>
+            <artifactId>riemann-java-client</artifactId>
+            <version>0.4.1</version>
+        </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>clojars.org</id>
+            <url>http://clojars.org/repo</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
