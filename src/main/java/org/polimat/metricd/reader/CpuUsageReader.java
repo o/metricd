@@ -6,6 +6,7 @@ import org.apache.commons.io.FileUtils;
 import org.polimat.metricd.AbstractReader;
 import org.polimat.metricd.Metric;
 import org.polimat.metricd.Threshold;
+import org.polimat.metricd.util.DerivedMetricUtils;
 import org.polimat.metricd.util.IOUtils;
 import org.polimat.metricd.util.MathUtils;
 import org.polimat.metricd.util.StringUtils;
@@ -29,17 +30,7 @@ public class CpuUsageReader extends AbstractReader {
 
     private final Integer cpuCores = Runtime.getRuntime().availableProcessors();
 
-    private Long lastUser = 0L;
-    private Long lastNice = 0L;
-    private Long lastSystem = 0L;
-    private Long lastIdle = 0L;
-    private Long lastIoWait = 0L;
-    private Long lastIrq = 0L;
-    private Long lastSoftIrq = 0L;
-    private Long lastSteal = 0L;
-    private Long lastGuest = 0L;
-    private Long lastGuestNice = 0L;
-    private Long lastTotalJiffies = 0L;
+    private final DerivedMetricUtils derivedMetricUtils = new DerivedMetricUtils();
 
     private Boolean isFirstRun = true;
 
@@ -81,17 +72,17 @@ public class CpuUsageReader extends AbstractReader {
             currentTotalJiffies += Long.parseLong(jiffy);
         }
 
-        Long userDiff = currentUser - lastUser;
-        Long niceDiff = currentNice - lastNice;
-        Long systemDiff = currentSystem - lastSystem;
-        Long idleDiff = currentIdle - lastIdle;
-        Long ioWaitDiff = currentIoWait - lastIoWait;
-        Long irqDiff = currentIrq - lastIrq;
-        Long softIrqDiff = currentSoftIrq - lastSoftIrq;
-        Long stealDiff = currentSteal - lastSteal;
-        Long guestDiff = currentGuest - lastGuest;
-        Long guestNiceDiff = currentGuestNice - lastGuestNice;
-        Long totalJiffiesDiff = currentTotalJiffies - lastTotalJiffies;
+        Long userDiff = derivedMetricUtils.getDifference("user", currentUser);
+        Long niceDiff = derivedMetricUtils.getDifference("nice", currentNice);
+        Long systemDiff = derivedMetricUtils.getDifference("system", currentSystem);
+        Long idleDiff = derivedMetricUtils.getDifference("idle", currentIdle);
+        Long ioWaitDiff = derivedMetricUtils.getDifference("iowait", currentIoWait);
+        Long irqDiff = derivedMetricUtils.getDifference("irq", currentIrq);
+        Long softIrqDiff = derivedMetricUtils.getDifference("softirq", currentSoftIrq);
+        Long stealDiff = derivedMetricUtils.getDifference("steal", currentSteal);
+        Long guestDiff = derivedMetricUtils.getDifference("guest", currentGuest);
+        Long guestNiceDiff = derivedMetricUtils.getDifference("guestnice", currentGuestNice);
+        Long totalJiffiesDiff = derivedMetricUtils.getDifference("total", currentTotalJiffies);
 
         Double workPercent = MathUtils.getPercent(userDiff + niceDiff + systemDiff, totalJiffiesDiff);
         Double userPercent = MathUtils.getPercent(userDiff, totalJiffiesDiff);
@@ -104,18 +95,6 @@ public class CpuUsageReader extends AbstractReader {
         Double stealPercent = MathUtils.getPercent(stealDiff, totalJiffiesDiff);
         Double guestPercent = MathUtils.getPercent(guestDiff, totalJiffiesDiff);
         Double guestNicePercent = MathUtils.getPercent(guestNiceDiff, totalJiffiesDiff);
-
-        lastUser = currentUser;
-        lastNice = currentNice;
-        lastSystem = currentSystem;
-        lastIdle = currentIdle;
-        lastIoWait = currentIoWait;
-        lastIrq = currentIrq;
-        lastSoftIrq = currentSoftIrq;
-        lastSteal = currentSteal;
-        lastGuest = currentGuest;
-        lastGuestNice = currentGuestNice;
-        lastTotalJiffies = currentTotalJiffies;
 
         if (isFirstRun) {
             LOGGER.info("Discarding events for first run");
@@ -157,7 +136,7 @@ public class CpuUsageReader extends AbstractReader {
         IOUtils.checkFile(statFile);
     }
 
-    private String getFileContents() throws IOException {
+    protected String getFileContents() throws IOException {
         return FileUtils.readFileToString(statFile);
     }
 }

@@ -6,17 +6,16 @@ import org.apache.commons.io.FileUtils;
 import org.polimat.metricd.AbstractReader;
 import org.polimat.metricd.Metric;
 import org.polimat.metricd.State;
+import org.polimat.metricd.util.DerivedMetricUtils;
 import org.polimat.metricd.util.IOUtils;
-import org.polimat.metricd.util.StringUtils;
+import org.polimat.metricd.util.MathUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class IOStatsReader extends AbstractReader {
 
@@ -24,22 +23,20 @@ public class IOStatsReader extends AbstractReader {
 
     private static final String FILENAME_SYS_BLOCK_STAT = "/sys/block/%s/stat";
 
-    private static final String FILENAME_PROC_DISK_STATS = "/proc/diskstats";
-    private static final Pattern PHYSICAL_DISK_NAME_PATTERN =
-            Pattern.compile("(\\w+da\\d?)\\s", Pattern.MULTILINE);
+    private final DerivedMetricUtils derivedMetricUtils = new DerivedMetricUtils();
+
+    private final String device;
+
+    private final File blockStatFile;
+
     private static final Long SECTOR_SIZE = 512L;
 
-    private final File diskStatsFile = new File(FILENAME_PROC_DISK_STATS);
-    private File blockStatsFile;
-
-    private Long lastReadOps = 0L;
-    private Long lastWriteOps = 0L;
-    private Long lastReadSectors = 0L;
-    private Long lastWriteSectors = 0L;
-    private Long lastReadMerged = 0L;
-    private Long lastWriteMerged = 0L;
-
     private Boolean isFirstRun = true;
+
+    public IOStatsReader(String device) {
+        this.device = device;
+        this.blockStatFile = getBlockStatFileFromName();
+    }
 
     @Override
     public List<Metric> collect() {
@@ -47,7 +44,7 @@ public class IOStatsReader extends AbstractReader {
 
         String line;
         try {
-            line = getBlockStatsFileContents();
+            line = getBlockStatFileContents();
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
             return metrics;
@@ -58,7 +55,6 @@ public class IOStatsReader extends AbstractReader {
                 .omitEmptyStrings()
                 .splitToList(line);
 
-
         Long currentReadOps = Long.parseLong(stats.get(0));
         Long currentReadMerged = Long.parseLong(stats.get(1));
         Long currentWriteOps = Long.parseLong(stats.get(4));
@@ -66,22 +62,15 @@ public class IOStatsReader extends AbstractReader {
         Long currentReadSectors = Long.parseLong(stats.get(2));
         Long currentWriteSectors = Long.parseLong(stats.get(6));
 
-        Long readOpsDiff = (currentReadOps - lastReadOps) / REPORT_PERIOD;
-        Long writeOpsDiff = (currentWriteOps - lastWriteOps) / REPORT_PERIOD;
-        Long readSectorsDiff = (currentReadSectors - lastReadSectors) / REPORT_PERIOD;
-        Long writeSectorsDiff = (currentWriteSectors - lastWriteSectors) / REPORT_PERIOD;
-        Long readMergedDiff = (currentReadMerged - lastReadMerged) / REPORT_PERIOD;
-        Long writeMergedDiff = (currentWriteMerged - lastWriteMerged) / REPORT_PERIOD;
+        Long readOpsDiff = derivedMetricUtils.getDifferenceWithRate("readops", currentReadOps);
+        Long writeOpsDiff = derivedMetricUtils.getDifferenceWithRate("writeops", currentWriteOps);
+        Long readSectorsDiff = derivedMetricUtils.getDifferenceWithRate("readsec", currentReadSectors);
+        Long writeSectorsDiff = derivedMetricUtils.getDifferenceWithRate("writesec", currentWriteSectors);
+        Long readMergedDiff = derivedMetricUtils.getDifferenceWithRate("readmerge", currentReadMerged);
+        Long writeMergedDiff = derivedMetricUtils.getDifferenceWithRate("writemerge", currentWriteMerged);
 
         Long readBytes = readSectorsDiff * SECTOR_SIZE;
         Long writeBytes = writeSectorsDiff * SECTOR_SIZE;
-
-        lastReadOps = currentReadOps;
-        lastWriteOps = currentWriteOps;
-        lastReadSectors = currentReadSectors;
-        lastWriteSectors = currentWriteSectors;
-        lastReadMerged = currentReadMerged;
-        lastWriteMerged = currentWriteMerged;
 
         if (isFirstRun) {
             LOGGER.info("Discarding events for first run");
@@ -90,29 +79,29 @@ public class IOStatsReader extends AbstractReader {
         }
 
         metrics.add(new Metric<>(
-                "Disk write operations", "metricd/io/ops/write", writeOpsDiff,
+                String.format("Disk write operations %s", device), String.format("metricd/io/%s/ops/write", device), writeOpsDiff,
                 State.OK,
                 String.format(
-                        "Write octets: %d bytes, Write operations: %d/sec, Write sectors: %d/sec",
-                        writeBytes, writeOpsDiff, writeSectorsDiff
+                        "Write octets: %s, Write operations: %d/sec, Write sectors: %d/sec",
+                        MathUtils.humanReadableByteCount(writeBytes), writeOpsDiff, writeSectorsDiff
                 )
         ));
 
         metrics.add(new Metric<>(
-                "Disk read operations", "metricd/io/ops/read", readOpsDiff,
+                String.format("Disk read operations %s", device), String.format("metricd/io/%s/ops/read", device), readOpsDiff,
                 State.OK,
                 String.format(
-                        "Read octets: %d bytes, Read operations: %d/sec, Read sectors: %d/sec",
-                        readBytes, readOpsDiff, readSectorsDiff
+                        "Read octets: %s, Read operations: %d/sec, Read sectors: %d/sec",
+                        MathUtils.humanReadableByteCount(readBytes), readOpsDiff, readSectorsDiff
                 )
 
         ));
 
-        metrics.add(new Metric<>("Disk write bytes", "metricd/io/octets/write", writeBytes));
-        metrics.add(new Metric<>("Disk read bytes", "metricd/io/octets/read", readBytes));
+        metrics.add(new Metric<>(String.format("Disk write bytes %s", device), String.format("metricd/io/%s/octets/write", device), writeBytes));
+        metrics.add(new Metric<>(String.format("Disk read bytes %s", device), String.format("metricd/io/%s/octets/read", device), readBytes));
 
-        metrics.add(new Metric<>("Merged write operations", "metricd/io/merged/write", writeMergedDiff));
-        metrics.add(new Metric<>("Merged read operations", "metricd/io/merged/read", readMergedDiff));
+        metrics.add(new Metric<>(String.format("Merged write operations %s", device), String.format("metricd/io/%s/merged/write", device), writeMergedDiff));
+        metrics.add(new Metric<>(String.format("Merged read operations %s", device), String.format("metricd/io/%s/merged/read", device), readMergedDiff));
 
         // TODO: add metricd/io/time/write and metricd/io/time/read
         return metrics;
@@ -120,34 +109,21 @@ public class IOStatsReader extends AbstractReader {
 
     @Override
     public String getName() {
-        return "I/O statistics";
+        return String.format("I/O statistics [%s]", device);
     }
 
     @Override
     public void startUp() throws Exception {
-        IOUtils.checkFile(diskStatsFile);
-        extractBlockName();
-        IOUtils.checkFile(blockStatsFile);
+        IOUtils.checkFile(blockStatFile);
     }
 
-    private void extractBlockName() throws IOException {
-        String line = getDiskStatsFileContents().trim();
-        String foundDeviceName = StringUtils.getFirstMatchFromString(PHYSICAL_DISK_NAME_PATTERN, line);
-
-        if (null != foundDeviceName) {
-            blockStatsFile = new File(String.format(FILENAME_SYS_BLOCK_STAT, foundDeviceName));
-            LOGGER.info("Disk device found : {}", foundDeviceName);
-        } else {
-            throw new FileNotFoundException("Unable to guess disk device name");
-        }
+    private String getBlockStatFileContents() throws IOException {
+        return FileUtils.readFileToString(blockStatFile);
     }
 
-    private String getDiskStatsFileContents() throws IOException {
-        return FileUtils.readFileToString(diskStatsFile);
+    protected File getBlockStatFileFromName() {
+        return new File(String.format(FILENAME_SYS_BLOCK_STAT, device));
     }
 
-    private String getBlockStatsFileContents() throws IOException {
-        return FileUtils.readFileToString(blockStatsFile);
-    }
 
 }

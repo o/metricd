@@ -49,8 +49,10 @@ public class ReaderService extends AbstractScheduledService {
                     List<Metric> metrics = future.get();
                     metricList.addAll(metrics);
                 }
-            } catch (InterruptedException | ExecutionException e) {
+            } catch (ExecutionException e) {
                 LOGGER.error("An error occured while executing reader: {}", e.getMessage());
+            } catch (InterruptedException e) {
+                LOGGER.error("A reader was interrupted due to timeout: {}", e.getMessage());
             }
         }
 

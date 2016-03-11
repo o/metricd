@@ -6,7 +6,9 @@ import org.apache.commons.io.FileUtils;
 import org.polimat.metricd.AbstractReader;
 import org.polimat.metricd.Metric;
 import org.polimat.metricd.Threshold;
+import org.polimat.metricd.util.DerivedMetricUtils;
 import org.polimat.metricd.util.IOUtils;
+import org.polimat.metricd.util.MathUtils;
 import org.polimat.metricd.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,14 +27,9 @@ public class NetworkUsageReader extends AbstractReader {
 
     private static final String FILENAME_PROC_NET_DEV = "/proc/net/dev";
 
-    private final File devFile = new File(FILENAME_PROC_NET_DEV);
+    private final DerivedMetricUtils derivedMetricUtils = new DerivedMetricUtils();
 
-    private Long lastRxBytes = 0L;
-    private Long lastTxBytes = 0L;
-    private Long lastRxErrors = 0L;
-    private Long lastTxErrors = 0L;
-    private Long lastRxPackets = 0L;
-    private Long lastTxPackets = 0L;
+    private final File devFile = new File(FILENAME_PROC_NET_DEV);
 
     private Boolean isFirstRun = true;
 
@@ -66,23 +63,12 @@ public class NetworkUsageReader extends AbstractReader {
         Long currentTxPackets = Long.parseLong(stats.get(9));
         Long currentTxErrors = Long.parseLong(stats.get(10));
 
-        Long rxBytesDiff = (currentRxBytes - lastRxBytes) / REPORT_PERIOD;
-        Long rxPacketsDiff = (currentRxPackets - lastRxPackets) / REPORT_PERIOD;
-        Long rxErrorsDiff = (currentRxErrors - lastRxErrors) / REPORT_PERIOD;
-        Long txBytesDiff = (currentTxBytes - lastTxBytes) / REPORT_PERIOD;
-        Long txPacketsDiff = (currentTxPackets - lastTxPackets) / REPORT_PERIOD;
-        Long txErrorsDiff = (currentTxErrors - lastTxErrors) / REPORT_PERIOD;
-
-        lastRxBytes = currentRxBytes;
-        lastRxErrors = currentRxErrors;
-        lastRxPackets = currentRxPackets;
-
-        lastTxBytes = currentTxBytes;
-        lastTxErrors = currentTxErrors;
-        lastTxPackets = currentTxPackets;
-
-        Double rxBytesDiffMb = (double) rxBytesDiff / 1024L / 1024L;
-        Double txBytesDiffMb = (double) txBytesDiff / 1024L / 1024L;
+        Long rxBytesDiff = derivedMetricUtils.getDifferenceWithRate("rxbyte", currentRxBytes);
+        Long rxPacketsDiff = derivedMetricUtils.getDifferenceWithRate("rxpacket", currentRxPackets);
+        Long rxErrorsDiff = derivedMetricUtils.getDifferenceWithRate("rxerror", currentRxErrors);
+        Long txBytesDiff = derivedMetricUtils.getDifferenceWithRate("txbyte", currentTxBytes);
+        Long txPacketsDiff = derivedMetricUtils.getDifferenceWithRate("txpacket", currentTxPackets);
+        Long txErrorsDiff = derivedMetricUtils.getDifferenceWithRate("txerror", currentTxErrors);
 
         if (isFirstRun) {
             LOGGER.info("Discarding events for first run");
@@ -93,14 +79,14 @@ public class NetworkUsageReader extends AbstractReader {
         metrics.add(new Metric<>(
                 "Received bytes", "metricd/network/octets/rx", rxBytesDiff,
                 Threshold.getState(rxErrorsDiff, 1, 2),
-                String.format("Received: %d bytes, %f MB", rxBytesDiff, rxBytesDiffMb)
+                String.format("Received: %s", FileUtils.byteCountToDisplaySize(rxBytesDiff))
 
         ));
 
         metrics.add(new Metric<>(
                 "Transferred bytes", "metricd/network/octets/tx", txBytesDiff,
                 Threshold.getState(txErrorsDiff, 1, 2),
-                String.format("Received: %d bytes, %f MB", txBytesDiff, txBytesDiffMb)
+                String.format("Transferred: %s", FileUtils.byteCountToDisplaySize(txBytesDiff))
         ));
 
         metrics.add(new Metric<>("Receive errors", "metricd/network/errors/rx", rxErrorsDiff));

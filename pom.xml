@@ -17,6 +17,10 @@
         <guava.version>19.0</guava.version>
         <jetty.version>9.3.7.v20160115</jetty.version>
         <jackson.version>2.7.1</jackson.version>
+        <riemann.version>0.4.1</riemann.version>
+        <apache-http.version>4.5.2</apache-http.version>
+        <junit.version>4.12</junit.version>
+        <mockito.version>2.0.43-beta</mockito.version>
     </properties>
 
     <dependencies>
@@ -53,7 +57,24 @@
         <dependency>
             <groupId>com.aphyr</groupId>
             <artifactId>riemann-java-client</artifactId>
-            <version>0.4.1</version>
+            <version>${riemann.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${apache-http.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

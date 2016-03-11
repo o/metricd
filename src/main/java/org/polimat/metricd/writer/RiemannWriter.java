@@ -33,7 +33,7 @@ public class RiemannWriter extends AbstractWriter {
 
     @Override
     public String getName() {
-        return "Riemann";
+        return String.format("Riemann [%s %s]", host, port);
     }
 
     @Override

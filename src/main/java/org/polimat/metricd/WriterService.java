@@ -44,10 +44,12 @@ public class WriterService extends AbstractExecutionThreadService {
                 try {
                     Future<Boolean> future = executorCompletionService.poll(TIMEOUT, TIMEOUT_UNIT);
                     if (null != future) {
-                        Boolean result = future.get();
+                        future.get();
                     }
-                } catch (InterruptedException | ExecutionException e) {
+                } catch (ExecutionException e) {
                     LOGGER.error("An error occured while executing writer: {}", e.getMessage());
+                } catch (InterruptedException e) {
+                    LOGGER.error("A reader was interrupted due to timeout: {}", e.getMessage());
                 }
             }
 

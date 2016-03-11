@@ -59,34 +59,35 @@ public class MemoryUsageReader extends AbstractReader {
         Long cachedSwapSpaceSize = Long.parseLong(StringUtils.getFirstMatchFromString(CACHED_SWAP_PATTERN, lines));
 
         Long freePhysicalMemorySizeWithBuffersAndCached = freePhysicalMemorySize + bufferedPhysicalMemorySize + cachedPhysicalMemorySize;
-        Long freeSwapSpaceSizeWithBuffers = freeSwapSpaceSize + cachedSwapSpaceSize;
-        Long usedPhysicalMemorySizeWithBuffersAndCached = totalPhysicalMemorySize - freePhysicalMemorySizeWithBuffersAndCached;
-        Long usedSwapSpaceSizeWithBuffers = totalSwapSpaceSize - freeSwapSpaceSizeWithBuffers;
+        Long usedPhysicalMemorySizeWithoutBuffersAndCached = totalPhysicalMemorySize - freePhysicalMemorySizeWithBuffersAndCached;
 
-        Double usedMemoryPercentage = MathUtils.getPercent(usedPhysicalMemorySizeWithBuffersAndCached, totalPhysicalMemorySize);
-        Double usedSwapPercentage = MathUtils.getPercent(usedSwapSpaceSizeWithBuffers, totalSwapSpaceSize);
+        Long freeSwapSpaceSizeWithBuffers = freeSwapSpaceSize + cachedSwapSpaceSize;
+        Long usedSwapSpaceSizeWithoutBuffers = totalSwapSpaceSize - freeSwapSpaceSizeWithBuffers;
+
+        Double usedMemoryPercentage = MathUtils.getPercent(usedPhysicalMemorySizeWithoutBuffersAndCached, totalPhysicalMemorySize);
+        Double usedSwapPercentage = MathUtils.getPercent(usedSwapSpaceSizeWithoutBuffers, totalSwapSpaceSize);
 
         metrics.add(new Metric<>(
                 "Memory usage", "metricd/memory/usage", usedMemoryPercentage,
                 Threshold.getState(usedMemoryPercentage),
-                String.format("Total: %d kB, Free: %d kB, Buffers: %d kB, Cached: %d kB", totalPhysicalMemorySize, freePhysicalMemorySize, bufferedPhysicalMemorySize, cachedPhysicalMemorySize)
+                String.format("Total: %d kB, Used: %d kB, Free: %d kB, Buffers: %d kB, Cached: %d kB", totalPhysicalMemorySize, usedPhysicalMemorySizeWithoutBuffersAndCached, freePhysicalMemorySizeWithBuffersAndCached, bufferedPhysicalMemorySize, cachedPhysicalMemorySize)
         ));
 
         metrics.add(new Metric<>(
                 "Swap file usage", "metricd/swap/usage", usedSwapPercentage,
                 Threshold.getState(usedSwapPercentage),
-                String.format("Total: %d kB, Free: %d kB, Cached: %d kB", totalSwapSpaceSize, freeSwapSpaceSize, cachedSwapSpaceSize)
+                String.format("Total: %d kB, Used: %d kB, Free: %d kB, Cached: %d kB", totalSwapSpaceSize, usedSwapSpaceSizeWithoutBuffers, freeSwapSpaceSizeWithBuffers, cachedSwapSpaceSize)
         ));
 
         metrics.add(new Metric<>("Total memory", "metricd/memory/total", totalPhysicalMemorySize));
-        metrics.add(new Metric<>("Free memory", "metricd/memory/free", freePhysicalMemorySize));
-        metrics.add(new Metric<>("Used memory", "metricd/memory/used", usedPhysicalMemorySizeWithBuffersAndCached));
+        metrics.add(new Metric<>("Free memory", "metricd/memory/free", freePhysicalMemorySizeWithBuffersAndCached));
+        metrics.add(new Metric<>("Used memory", "metricd/memory/used", usedPhysicalMemorySizeWithoutBuffersAndCached));
         metrics.add(new Metric<>("Buffered memory", "metricd/memory/buffered", bufferedPhysicalMemorySize));
         metrics.add(new Metric<>("Cached memory", "metricd/memory/cached", cachedPhysicalMemorySize));
 
         metrics.add(new Metric<>("Total swap", "metricd/swap/total", totalSwapSpaceSize));
-        metrics.add(new Metric<>("Free swap", "metricd/swap/free", freeSwapSpaceSize));
-        metrics.add(new Metric<>("Used swap", "metricd/swap/used", usedSwapSpaceSizeWithBuffers));
+        metrics.add(new Metric<>("Free swap", "metricd/swap/free", freeSwapSpaceSizeWithBuffers));
+        metrics.add(new Metric<>("Used swap", "metricd/swap/used", usedSwapSpaceSizeWithoutBuffers));
         metrics.add(new Metric<>("Cached swap", "metricd/swap/cached", cachedSwapSpaceSize));
 
         return metrics;

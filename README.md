@@ -9,15 +9,17 @@ Currently implemented readers
 * CPU
 * Memory
 * Swap
-* Disk usage (currently root filesystem)
-* IO stats (currently only sda)
-* Network statistics (currently only supports eth0)
+* Disk usage
+* IO stats
+* Network statistics (only supports eth0)
 * Load averages
 * Network connections
 
-Metric readers for SQL servers, web servers and popular tools will be added.
+Currently implemented writers
+* Riemann
+* Console
+* Jetty JSON
+* HTTP JSON
 
-Only supports writing metrics to stdout. But stable version aims to provide sending data to Riemann, InfluxDB, Graphite, StatsD, JSON HTTP and more..
-
-**This is a pre-release and things will be change before stable release**
+**This is a highly experimental project and things will be change before stable release**
 

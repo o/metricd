@@ -7,9 +7,7 @@ cpu:
 
 disk:
   enabled: true
-
-io:
-  enabled: true
+#  devices: ["/dev/sda1"] #If you want to enable for certain disk devices
 
 load:
   enabled: true
@@ -31,3 +29,8 @@ riemann:
   enabled: false
   host: 127.0.0.2
   port: 5555
+
+http:
+  enabled: true
+  url: http://localhost:3000/collect
+  headers: {X-Access-Token: t0oS3cr3t}

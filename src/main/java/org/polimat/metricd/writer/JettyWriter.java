@@ -92,7 +92,7 @@ public class JettyWriter extends AbstractWriter {
 
     @Override
     public String getName() {
-        return "Jetty JSON";
+        return String.format("Jetty server [port %d]", port);
     }
 
     public class JsonEndpointHandler extends AbstractHandler {

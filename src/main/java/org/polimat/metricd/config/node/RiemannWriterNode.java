@@ -1,5 +1,6 @@
 package org.polimat.metricd.config.node;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import org.polimat.metricd.Plugin;
@@ -9,8 +10,10 @@ import java.util.Set;
 
 public class RiemannWriterNode extends AbstractNode {
 
+    @JsonProperty
     private String host;
 
+    @JsonProperty
     private Integer port;
 
     public String getHost() {

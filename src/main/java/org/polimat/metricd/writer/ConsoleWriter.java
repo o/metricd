@@ -12,11 +12,7 @@ public class ConsoleWriter extends AbstractWriter {
     @Override
     protected Boolean write() {
         for (Metric metric : getMetrics()) {
-            if (null != metric.getDescription()) {
-                LOGGER.info("{}, {}, {}, {}", metric.getName(), metric.getState(), metric.getValue(), metric.getDescription());
-            } else {
-                LOGGER.info("{}, {}, {}", metric.getName(), metric.getState(), metric.getValue());
-            }
+            LOGGER.info(metric.toString());
         }
         return true;
     }

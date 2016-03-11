@@ -2,7 +2,7 @@ package org.polimat.metricd;
 
 import com.google.common.base.MoreObjects;
 
-public class Metric<V> {
+public final class Metric<V> {
 
     private final String name;
     private final String key;

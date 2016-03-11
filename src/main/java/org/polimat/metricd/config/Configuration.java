@@ -27,9 +27,6 @@ public class Configuration {
     private DiskUsageReaderNode disk;
 
     @JsonProperty
-    private IOStatsReaderNode io;
-
-    @JsonProperty
     private LoadAverageReaderNode load;
 
     @JsonProperty
@@ -41,6 +38,9 @@ public class Configuration {
     @JsonProperty
     private RiemannWriterNode riemann;
 
+    @JsonProperty
+    private JsonHttpWriterNode http;
+
     @JsonIgnore
     public Set<Plugin> getPlugins() {
         Set<Plugin> plugins = Sets.newHashSet();
@@ -49,13 +49,13 @@ public class Configuration {
         plugins.addAll(connections.buildIfEnabled());
         plugins.addAll(cpu.buildIfEnabled());
         plugins.addAll(disk.buildIfEnabled());
-        plugins.addAll(io.buildIfEnabled());
         plugins.addAll(load.buildIfEnabled());
         plugins.addAll(memory.buildIfEnabled());
         plugins.addAll(network.buildIfEnabled());
         plugins.addAll(console.buildIfEnabled());
         plugins.addAll(jetty.buildIfEnabled());
         plugins.addAll(riemann.buildIfEnabled());
+        plugins.addAll(http.buildIfEnabled());
 
         return plugins;
     }
